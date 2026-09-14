@@ -1,0 +1,91 @@
+import React, { useState, useEffect } from 'react';
+
+interface GlitchTextProps {
+  text: string;
+  className?: string;
+  as?: 'h1' | 'h2' | 'h3' | 'span' | 'p' | 'div';
+  glitchOnHover?: boolean;
+  periodicGlitch?: boolean;
+  color?: string;
+}
+
+const GLITCH_CHARS = '!<>-_\\/[]{}—=+*^?#________01';
+
+export const GlitchText: React.FC<GlitchTextProps> = ({
+  text,
+  className = '',
+  as: Component = 'span',
+  glitchOnHover = false,
+  periodicGlitch = false,
+}) => {
+  const [displayText, setDisplayText] = useState(text);
+  const [isGlitching, setIsGlitching] = useState(false);
+
+  const triggerScramble = () => {
+    setIsGlitching(true);
+    let iterations = 0;
+    const maxIterations = 8;
+    const interval = setInterval(() => {
+      setDisplayText(
+        text
+          .split('')
+          .map((char, index) => {
+            if (char === ' ') return ' ';
+            if (index < iterations) return text[index];
+            return GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+          })
+          .join('')
+      );
+
+      if (iterations >= text.length) {
+        clearInterval(interval);
+        setDisplayText(text);
+        setIsGlitching(false);
+      }
+      iterations += 1 / (maxIterations / text.length || 1);
+    }, 30);
+  };
+
+  useEffect(() => {
+    setDisplayText(text);
+  }, [text]);
+
+  useEffect(() => {
+    if (!periodicGlitch) return;
+    const interval = setInterval(() => {
+      if (Math.random() > 0.6) {
+        triggerScramble();
+      }
+    }, 7000);
+    return () => clearInterval(interval);
+  }, [periodicGlitch, text]);
+
+  return (
+    <Component
+      onMouseEnter={() => {
+        if (glitchOnHover && !isGlitching) triggerScramble();
+      }}
+      className={`relative inline-block tracking-wider transition-colors duration-150 ${className} ${
+        isGlitching ? 'text-cyan-accent active-screen-glitch' : ''
+      }`}
+    >
+      <span className="relative z-10">{displayText}</span>
+      {isGlitching && (
+        <>
+          <span
+            aria-hidden="true"
+            className="absolute top-0 left-0 -ml-[1px] text-red-500 opacity-70 clip-path-glitch select-none pointer-events-none"
+          >
+            {displayText}
+          </span>
+          <span
+            aria-hidden="true"
+            className="absolute top-0 left-0 ml-[1px] text-cyan-accent opacity-70 clip-path-glitch select-none pointer-events-none"
+          >
+            {displayText}
+          </span>
+        </>
+      )}
+    </Component>
+  );
+};
