@@ -5,6 +5,7 @@ import { ClueCard } from './ClueCard';
 import { CLUES_CONFIG } from '../config/launchConfig';
 import { saveDecryptedClueId } from '../utils/storage';
 import { soundEngine } from '../utils/sound';
+import { toast } from '../utils/toast';
 
 interface ClueSystemProps {
   decryptedClueIds: string[];
@@ -26,9 +27,17 @@ export const ClueSystem: React.FC<ClueSystemProps> = ({
     const updated = saveDecryptedClueId(clueId);
     onDecryptedUpdate(updated);
 
+    const clue = CLUES_CONFIG.find((c) => c.id === clueId);
+    toast.show(
+      'SIGNAL ARCHIVE UNSEALED',
+      clue ? `Decrypted: ${clue.label} — ${clue.revealedText}` : 'Classified signal record accessed',
+      'success'
+    );
+
     // If reached 6/6 clues, trigger the climax:
     // "YOU'RE GETTING CLOSE." -> "ACCESS REVOKED." -> heavy screen glitch!
     if (updated.length === 6) {
+      toast.show('SECURITY BREACH DETECTED', 'All classified carrier wave vectors unsealed', 'alert');
       setTimeout(() => {
         setSecurityAlert('GETTING_CLOSE');
         soundEngine.playBeep(880, 0.15, 'triangle', 0.08);

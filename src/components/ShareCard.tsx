@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Copy, Check, Share2, MessageSquare, Radio, Shield } from 'lucide-react';
 import { soundEngine } from '../utils/sound';
+import { toast } from '../utils/toast';
 
 export const ShareCard: React.FC = () => {
   const [copied, setCopied] = useState(false);
@@ -14,9 +15,10 @@ export const ShareCard: React.FC = () => {
     try {
       await navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
       setCopied(true);
+      toast.show('DOSSIER COPIED', 'Encrypted transmission link copied to clipboard', 'success');
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Fallback
+      toast.show('CLIPBOARD ERROR', 'Unable to access clipboard directly', 'warning');
     }
   };
 
@@ -75,7 +77,7 @@ export const ShareCard: React.FC = () => {
         </p>
 
         {/* The Screenshot-Worthy Classified Dossier Card */}
-        <div className="mt-10 w-full max-w-md p-6 sm:p-8 rounded-xl bg-gradient-to-b from-zinc-950 to-zinc-900/90 border border-zinc-700/80 shadow-[0_15px_45px_rgba(0,0,0,0.8)] relative font-mono text-left select-none overflow-hidden group">
+        <div className="mt-10 w-full max-w-md p-6 sm:p-8 rounded-xl bg-gradient-to-b from-zinc-950 to-zinc-900/90 border border-zinc-700/80 shadow-[0_15px_45px_rgba(0,0,0,0.8)] relative font-mono text-left select-none overflow-hidden group scroll-reveal-card">
           {/* Card Scanline & Border Accent */}
           <div className="absolute inset-0 scanline-overlay opacity-25 pointer-events-none" />
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-zinc-700 via-cyan-accent to-zinc-700" />

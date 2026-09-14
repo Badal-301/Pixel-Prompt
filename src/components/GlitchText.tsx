@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 interface GlitchTextProps {
   text: string;
@@ -19,9 +19,16 @@ export const GlitchText: React.FC<GlitchTextProps> = ({
   periodicGlitch = false,
 }) => {
   const [displayText, setDisplayText] = useState(text);
+  const [prevText, setPrevText] = useState(text);
   const [isGlitching, setIsGlitching] = useState(false);
 
-  const triggerScramble = () => {
+  // Sync state if text prop changes
+  if (text !== prevText) {
+    setPrevText(text);
+    setDisplayText(text);
+  }
+
+  const triggerScramble = useCallback(() => {
     setIsGlitching(true);
     let iterations = 0;
     const maxIterations = 8;
@@ -44,10 +51,6 @@ export const GlitchText: React.FC<GlitchTextProps> = ({
       }
       iterations += 1 / (maxIterations / text.length || 1);
     }, 30);
-  };
-
-  useEffect(() => {
-    setDisplayText(text);
   }, [text]);
 
   useEffect(() => {
@@ -58,7 +61,7 @@ export const GlitchText: React.FC<GlitchTextProps> = ({
       }
     }, 7000);
     return () => clearInterval(interval);
-  }, [periodicGlitch, text]);
+  }, [periodicGlitch, triggerScramble]);
 
   return (
     <Component
@@ -73,14 +76,14 @@ export const GlitchText: React.FC<GlitchTextProps> = ({
       {isGlitching && (
         <>
           <span
+            className="absolute top-0 left-0 text-red-500 opacity-70 pointer-events-none select-none -translate-x-[2px] translate-y-[1px]"
             aria-hidden="true"
-            className="absolute top-0 left-0 -ml-[1px] text-red-500 opacity-70 clip-path-glitch select-none pointer-events-none"
           >
             {displayText}
           </span>
           <span
+            className="absolute top-0 left-0 text-cyan-accent opacity-70 pointer-events-none select-none translate-x-[2px] -translate-y-[1px]"
             aria-hidden="true"
-            className="absolute top-0 left-0 ml-[1px] text-cyan-accent opacity-70 clip-path-glitch select-none pointer-events-none"
           >
             {displayText}
           </span>

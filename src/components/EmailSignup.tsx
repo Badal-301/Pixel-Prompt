@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, CheckCircle2, Mail, Radio } from 'lucide-react';
 import { saveRegistration, getRegistration } from '../utils/storage';
 import type { TransmissionRegistration } from '../types';
 import { soundEngine } from '../utils/sound';
+import { toast } from '../utils/toast';
 
 interface EmailSignupProps {
   onTriggerGlitch: () => void;
@@ -12,21 +13,15 @@ interface EmailSignupProps {
 export const EmailSignup: React.FC<EmailSignupProps> = ({ onTriggerGlitch }) => {
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [registration, setRegistration] = useState<TransmissionRegistration | null>(null);
+  const [registration, setRegistration] = useState<TransmissionRegistration | null>(() => getRegistration());
   const [errorMsg, setErrorMsg] = useState('');
-
-  useEffect(() => {
-    const existing = getRegistration();
-    if (existing) {
-      setRegistration(existing);
-    }
-  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !email.includes('@') || !email.includes('.')) {
       setErrorMsg('INVALID COMM-LINK FORMAT. VERIFY EMAIL.');
       soundEngine.playBeep(220, 0.1, 'sawtooth', 0.05);
+      toast.show('VALIDATION FAILED', 'Please enter a valid comm-link address', 'warning');
       return;
     }
 
@@ -44,6 +39,7 @@ export const EmailSignup: React.FC<EmailSignupProps> = ({ onTriggerGlitch }) => 
         setRegistration(reg);
         setIsSubmitting(false);
         soundEngine.playAccessGranted();
+        toast.show('COMM-LINK REGISTERED', `Transmission ID: ${reg.transmissionId}`, 'success');
       }, 500);
     }, 400);
   };
@@ -72,7 +68,7 @@ export const EmailSignup: React.FC<EmailSignupProps> = ({ onTriggerGlitch }) => 
         </p>
 
         {/* Form or Confirmation Card */}
-        <div className="mt-10 w-full max-w-md">
+        <div className="mt-10 w-full max-w-md scroll-reveal-card">
           <AnimatePresence mode="wait">
             {!registration ? (
               <motion.form

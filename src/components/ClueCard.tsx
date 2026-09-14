@@ -69,7 +69,7 @@ export const ClueCard: React.FC<ClueCardProps> = ({
       }}
       onMouseLeave={() => setIsHovered(false)}
       onClick={handleCardClick}
-      className={`relative p-5 sm:p-6 rounded-lg font-mono text-left select-none overflow-hidden transition-all duration-300 border ${
+      className={`relative p-5 sm:p-6 rounded-lg font-mono text-left select-none overflow-hidden transition-all duration-300 border scroll-reveal-card ${
         isLocked
           ? 'bg-zinc-950/40 border-zinc-900 opacity-60 cursor-not-allowed'
           : isDecrypted

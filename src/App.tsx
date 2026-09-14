@@ -8,18 +8,17 @@ import { ShareCard } from './components/ShareCard';
 import { EasterEgg } from './components/EasterEgg';
 import { FinalCTA } from './components/FinalCTA';
 import { Footer } from './components/Footer';
+import { HUDToast } from './components/HUDToast';
 import { getDecryptedClueIds } from './utils/storage';
 import { CLUES_CONFIG } from './config/launchConfig';
 
 export function App() {
-  const [decryptedClueIds, setDecryptedClueIds] = useState<string[]>([]);
+  const [decryptedClueIds, setDecryptedClueIds] = useState<string[]>(() => getDecryptedClueIds());
   const [isGlitching, setIsGlitching] = useState<boolean>(false);
   const [isEasterEggOpen, setIsEasterEggOpen] = useState<boolean>(false);
 
-  // Initialize storage progress
+  // Storage and backdoor event listeners
   useEffect(() => {
-    setDecryptedClueIds(getDecryptedClueIds());
-
     const handleProgressUpdate = (e: Event) => {
       const customEvent = e as CustomEvent<{ decryptedCount: number }>;
       if (customEvent.detail && typeof customEvent.detail.decryptedCount === 'number') {
@@ -69,7 +68,7 @@ export function App() {
 
       {/* 3. Main Cinematic Flow */}
       <main className="relative z-10 w-full flex flex-col items-center">
-        {/* HERO (100vh with Silhouette, HUD, Typography, CTAs) */}
+        {/* HERO (100vh with 3D Egg, HUD, Typography, CTAs, Temporal Matrix) */}
         <Hero
           decryptedCount={decryptedClueIds.length}
           isGlitching={isGlitching}
@@ -108,6 +107,9 @@ export function App() {
         onClose={() => setIsEasterEggOpen(false)}
         onTriggerGlitch={triggerGlitch}
       />
+
+      {/* 6. Persistent High-Tech HUD Toast System */}
+      <HUDToast />
     </div>
   );
 }
